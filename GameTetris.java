@@ -48,6 +48,13 @@ class GameTetris extends JFrame {
         setBounds(START_LOCATION, START_LOCATION, FIELD_WIDTH * BLOCK_SIZE + FIELD_DX, FIELD_HEIGHT * BLOCK_SIZE + FIELD_DY);
         setResizable(false);
         canvas.setBackground(Color.black); // define the background color
+addKeyListener(new KeyAdapter() {
+            public void keyPressed(KeyEvent e) {
+                if (!gameOver) {
+                    if (e.getKeyCode() == DOWN) figure.drop();                }
+                canvas.repaint();
+            }
+        });
         add(BorderLayout.CENTER, canvas);
         setVisible(true);
         Arrays.fill(mine[FIELD_HEIGHT], 1); // create a ground for mines
@@ -122,7 +129,7 @@ class GameTetris extends JFrame {
             y++;
         }
 
-        void drop() { }
+        void drop() {while (!isTouchGround()) stepDown(); }
 
 
 
