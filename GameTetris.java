@@ -51,7 +51,9 @@ class GameTetris extends JFrame {
 addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
                 if (!gameOver) {
-                    if (e.getKeyCode() == DOWN) figure.drop();                }
+                    if (e.getKeyCode() == DOWN) figure.drop();
+                    if (e.getKeyCode() == UP) figure.rotate();
+                    if (e.getKeyCode() == LEFT || e.getKeyCode() == RIGHT) figure.move(e.getKeyCode());}
                 canvas.repaint();
             }
         });
