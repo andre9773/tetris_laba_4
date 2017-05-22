@@ -48,6 +48,13 @@ class GameTetris extends JFrame {
         setBounds(START_LOCATION, START_LOCATION, FIELD_WIDTH * BLOCK_SIZE + FIELD_DX, FIELD_HEIGHT * BLOCK_SIZE + FIELD_DY);
         setResizable(false);
         canvas.setBackground(Color.black); // define the background color
+addKeyListener(new KeyAdapter() {
+            public void keyPressed(KeyEvent e) {
+                if (!gameOver) {
+                    if (e.getKeyCode() == DOWN) figure.drop();                }
+                canvas.repaint();
+            }
+        });
         add(BorderLayout.CENTER, canvas);
         setVisible(true);
         Arrays.fill(mine[FIELD_HEIGHT], 1); // create a ground for mines
@@ -91,8 +98,8 @@ class GameTetris extends JFrame {
                 for (int y = 0; y < size; y++)
                     if (shape[y][x] == 1) figure.add(new Block(x + this.x, y + this.y));
         }
-
-        boolean isTouchGround() {
+          boolean isTouchGround() {
+            for (Block block : figure) if (mine[block.getY() + 1][block.getX()] > 0) return true;
             return false;
         }
 
@@ -101,6 +108,7 @@ class GameTetris extends JFrame {
         }
 
         void leaveOnTheGround() {
+            for (Block block : figure) mine[block.getY()][block.getX()] = color;
         }
 
         boolean isTouchWall(int direction) {
@@ -119,8 +127,8 @@ class GameTetris extends JFrame {
             for (Block block : figure) block.setY(block.getY() + 1);
             y++;
         }
+        void drop() {while (!isTouchGround()) stepDown(); }
 
-        void drop() { }
 
 
 
@@ -159,6 +167,13 @@ class GameTetris extends JFrame {
         @Override
         public void paint(Graphics g) {
             super.paint(g);
+            for (int x = 0; x < FIELD_WIDTH; x++)
+                for (int y = 0; y < FIELD_HEIGHT; y++) {
+                  if (mine[y][x] > 0) {
+                        g.setColor(new Color(mine[y][x]));
+                        g.fill3DRect(x*BLOCK_SIZE+1, y*BLOCK_SIZE+1, BLOCK_SIZE-1, BLOCK_SIZE-1, true);
+                    }
+                }
                 figure.paint(g);
         }
     }
