@@ -98,7 +98,6 @@ addKeyListener(new KeyAdapter() {
                 for (int y = 0; y < size; y++)
                     if (shape[y][x] == 1) figure.add(new Block(x + this.x, y + this.y));
         }
-
           boolean isTouchGround() {
             for (Block block : figure) if (mine[block.getY() + 1][block.getX()] > 0) return true;
             return false;
@@ -128,8 +127,8 @@ addKeyListener(new KeyAdapter() {
             for (Block block : figure) block.setY(block.getY() + 1);
             y++;
         }
-
         void drop() {while (!isTouchGround()) stepDown(); }
+
 
 
 
