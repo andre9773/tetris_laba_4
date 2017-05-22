@@ -161,6 +161,13 @@ class GameTetris extends JFrame {
         @Override
         public void paint(Graphics g) {
             super.paint(g);
+            for (int x = 0; x < FIELD_WIDTH; x++)
+                for (int y = 0; y < FIELD_HEIGHT; y++) {
+                  if (mine[y][x] > 0) {
+                        g.setColor(new Color(mine[y][x]));
+                        g.fill3DRect(x*BLOCK_SIZE+1, y*BLOCK_SIZE+1, BLOCK_SIZE-1, BLOCK_SIZE-1, true);
+                    }
+                }
                 figure.paint(g);
         }
     }
