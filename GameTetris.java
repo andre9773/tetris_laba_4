@@ -40,7 +40,19 @@ class GameTetris extends JFrame {
     Random random = new Random();
     Figure figure = new Figure();
     boolean gameOver = false;
-
+    final int[][] GAME_OVER_MSG = {
+        {0,1,1,0,0,0,1,1,0,0,0,1,0,1,0,0,0,1,1,0},
+        {1,0,0,0,0,1,0,0,1,0,1,0,1,0,1,0,1,0,0,1},
+        {1,0,1,1,0,1,1,1,1,0,1,0,1,0,1,0,1,1,1,1},
+        {1,0,0,1,0,1,0,0,1,0,1,0,1,0,1,0,1,0,0,0},
+        {0,1,1,0,0,1,0,0,1,0,1,0,1,0,1,0,0,1,1,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,1,1,0,0,1,0,0,1,0,0,1,1,0,0,1,1,1,0,0},
+        {1,0,0,1,0,1,0,0,1,0,1,0,0,1,0,1,0,0,1,0},
+        {1,0,0,1,0,1,0,1,0,0,1,1,1,1,0,1,1,1,0,0},
+        {1,0,0,1,0,1,1,0,0,0,1,0,0,0,0,1,0,0,1,0},
+        {0,1,1,0,0,1,0,0,0,0,0,1,1,0,0,1,0,0,1,0}};
 
     public static void main(String[] args) {
         new GameTetris().go();
@@ -130,7 +142,7 @@ class GameTetris extends JFrame {
         }
 
         boolean isCrossGround() {
-
+            for (Block block : figure) if (mine[block.getY()][block.getX()] > 0) return true;
             return false;
         }
 
@@ -240,7 +252,12 @@ class GameTetris extends JFrame {
                         g.fill3DRect(x*BLOCK_SIZE+1, y*BLOCK_SIZE+1, BLOCK_SIZE-1, BLOCK_SIZE-1, true);
                     }
                 }
-           
+            if (gameOver) {
+                g.setColor(Color.white);
+                for (int y = 0; y < GAME_OVER_MSG.length; y++)
+                    for (int x = 0; x < GAME_OVER_MSG[y].length; x++)
+                        if (GAME_OVER_MSG[y][x] == 1) g.fill3DRect(x*11+18, y*11+160, 10, 10, true);
+            } else
                 figure.paint(g);
         }
     }
