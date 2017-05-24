@@ -32,12 +32,16 @@ class GameTetris extends JFrame {
         {{1,1,1,0}, {0,1,0,0}, {0,0,0,0}, {0,0,0,0}, {3, 0xa000f0}}, // T
         {{1,1,0,0}, {0,1,1,0}, {0,0,0,0}, {0,0,0,0}, {3, 0xf00000}}  // Z
     };
+    final int[] SCORES = {100, 300, 700, 1500};
+    int gameScore = 0;
     int[][] mine = new int[FIELD_HEIGHT + 1][FIELD_WIDTH]; // mine/glass
     JFrame frame;
     Canvas canvas = new Canvas();
     Random random = new Random();
     Figure figure = new Figure();
     boolean gameOver = false;
+
+
     public static void main(String[] args) {
         new GameTetris().go();
     }
@@ -48,12 +52,13 @@ class GameTetris extends JFrame {
         setBounds(START_LOCATION, START_LOCATION, FIELD_WIDTH * BLOCK_SIZE + FIELD_DX, FIELD_HEIGHT * BLOCK_SIZE + FIELD_DY);
         setResizable(false);
         canvas.setBackground(Color.black); // define the background color
-addKeyListener(new KeyAdapter() {
+        addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
                 if (!gameOver) {
                     if (e.getKeyCode() == DOWN) figure.drop();
                     if (e.getKeyCode() == UP) figure.rotate();
-                    if (e.getKeyCode() == LEFT || e.getKeyCode() == RIGHT) figure.move(e.getKeyCode());}
+                    if (e.getKeyCode() == LEFT || e.getKeyCode() == RIGHT) figure.move(e.getKeyCode());
+                }
                 canvas.repaint();
             }
         });
@@ -68,6 +73,7 @@ addKeyListener(new KeyAdapter() {
                 Thread.sleep(SHOW_DELAY);
             } catch (Exception e) { e.printStackTrace(); }
             canvas.repaint();
+            checkFilling();
             if (figure.isTouchGround()) {
                 figure.leaveOnTheGround();
                 figure = new Figure();
@@ -77,7 +83,24 @@ addKeyListener(new KeyAdapter() {
         }
     }
 
-
+    void checkFilling() { // check filling rows
+        int row = FIELD_HEIGHT - 1;
+        int countFillRows = 0;
+        while (row > 0) {
+            int filled = 1;
+            for (int col = 0; col < FIELD_WIDTH; col++)
+                filled *= Integer.signum(mine[row][col]);
+            if (filled > 0) {
+                countFillRows++;
+                for (int i = row; i > 0; i--) System.arraycopy(mine[i-1], 0, mine[i], 0, FIELD_WIDTH);
+            } else
+                row--;
+        }
+        if (countFillRows > 0) {
+            gameScore += SCORES[countFillRows - 1];
+            setTitle(TITLE_OF_PROGRAM + " : " + gameScore);
+        }
+    }
 
     class Figure {
         private ArrayList<Block> figure = new ArrayList<Block>();
@@ -100,12 +123,14 @@ addKeyListener(new KeyAdapter() {
                 for (int y = 0; y < size; y++)
                     if (shape[y][x] == 1) figure.add(new Block(x + this.x, y + this.y));
         }
-          boolean isTouchGround() {
+
+        boolean isTouchGround() {
             for (Block block : figure) if (mine[block.getY() + 1][block.getX()] > 0) return true;
             return false;
         }
 
         boolean isCrossGround() {
+
             return false;
         }
 
@@ -114,6 +139,10 @@ addKeyListener(new KeyAdapter() {
         }
 
         boolean isTouchWall(int direction) {
+            for (Block block : figure) {
+                if (direction == LEFT && (block.getX() == 0 || mine[block.getY()][block.getX() - 1] > 0)) return true;
+                if (direction == RIGHT && (block.getX() == FIELD_WIDTH - 1 || mine[block.getY()][block.getX() + 1] > 0)) return true;
+            }
             return false;
         }
 
@@ -129,8 +158,8 @@ addKeyListener(new KeyAdapter() {
             for (Block block : figure) block.setY(block.getY() + 1);
             y++;
         }
-        void drop() {while (!isTouchGround()) stepDown(); }
 
+        void drop() { while (!isTouchGround()) stepDown(); }
 
         boolean isWrongPosition() {
             for (int x = 0; x < size; x++)
@@ -162,7 +191,7 @@ addKeyListener(new KeyAdapter() {
         }
 
         void rotate() {
-             rotateShape(RIGHT);
+            rotateShape(RIGHT);
             if (!isWrongPosition()) {
                 figure.clear();
                 createFromShape();
@@ -201,11 +230,17 @@ addKeyListener(new KeyAdapter() {
             super.paint(g);
             for (int x = 0; x < FIELD_WIDTH; x++)
                 for (int y = 0; y < FIELD_HEIGHT; y++) {
-                  if (mine[y][x] > 0) {
+                    if (x < FIELD_WIDTH - 1 && y < FIELD_HEIGHT - 1) {
+                        g.setColor(Color.lightGray);
+                        g.drawLine((x+1)*BLOCK_SIZE-2, (y+1)*BLOCK_SIZE, (x+1)*BLOCK_SIZE+2, (y+1)*BLOCK_SIZE);
+                        g.drawLine((x+1)*BLOCK_SIZE, (y+1)*BLOCK_SIZE-2, (x+1)*BLOCK_SIZE, (y+1)*BLOCK_SIZE+2);
+                    }
+                    if (mine[y][x] > 0) {
                         g.setColor(new Color(mine[y][x]));
                         g.fill3DRect(x*BLOCK_SIZE+1, y*BLOCK_SIZE+1, BLOCK_SIZE-1, BLOCK_SIZE-1, true);
                     }
                 }
+           
                 figure.paint(g);
         }
     }
